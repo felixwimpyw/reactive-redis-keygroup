@@ -13,9 +13,10 @@ When creating a cache, we cannot differentiate by just a parameter. Sometimes on
 Why not use the Spring one?
 =====
 This one is a little bit complex. It actually have me hard time once. We always use spring-data-redis before with a @Cacheable support. It easier and more clean by the code. We use @CacheEvict allEntries=true and it works just fine. 
-One day there is problem which the lock is somehow stuck in redis. And it make the @Cacheable method wait by 30 seconds. It makes some of our services down by random. This makes us frustate and once we know the problem is on the @CacheEvict allEntries=true.
-After that we remove all allEntries=true codes in our codeBase, and use flushAll instead.
-That is like 2 years ago. Now there is spring-data-redis v2.0, it somehow has better logic on allEntries=true so we decides to use it. But after some period, there is performance issue which is spiking everytime we hit evict. We found that they are using REDIS KEYS which is actually having O(n) complexity, so it will cause this issue when our keys is huge ~ 100,000 data. You can see here for the info https://redis.io/commands/KEYS.
+
+One day there is problem which the lock is somehow stuck in redis. And it make the @Cacheable method wait by 30 seconds. It makes some of our services down by random. This makes us frustate and once we know the problem is on the @CacheEvict allEntries=true. After that we remove all allEntries=true codes in our codeBase, and use flushAll instead.
+
+That is like 2 years ago. Now there is spring-data-redis v2.0, it somehow has better logic on allEntries=true so we decides to use it. But after some period, there is performance issue which is spiking everytime we hit evict. We found that they are using REDIS KEYS which is actually having O(n) complexity, where N is the **database count**. so it will cause this issue when our keys is huge ~ 100,000 data. You can see here for the info https://redis.io/commands/KEYS.
 After this, I decide to create one simpler library for redis and add reactive support also.
 
 How To Use?
